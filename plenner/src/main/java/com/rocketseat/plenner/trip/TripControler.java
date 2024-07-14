@@ -1,6 +1,9 @@
 package com.rocketseat.plenner.trip;
 
 import com.rocketseat.plenner.activity.*;
+import com.rocketseat.plenner.link.LinkRequestPayload;
+import com.rocketseat.plenner.link.LinkResponse;
+import com.rocketseat.plenner.link.LinkService;
 import com.rocketseat.plenner.participant.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -18,12 +21,14 @@ public class TripControler {
 
     @Autowired
     private ParticipantService participantService;
-
     @Autowired
     private ActivityService activityService;
-
+    @Autowired
+    private LinkService linkService;
     @Autowired
     private TripRepository repository;
+
+    // TRIPS
 
     @PostMapping
     public ResponseEntity<TripCreateResponse> createTrip(@RequestBody TripRequestPayload payload){
@@ -37,7 +42,7 @@ public class TripControler {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Trip> getTripDatails(@PathVariable UUID id){
+    public ResponseEntity<Trip> getTripDetails(@PathVariable UUID id){
         Optional<Trip> trip = repository.findById(id);
 
         return trip.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
@@ -82,25 +87,7 @@ public class TripControler {
         return ResponseEntity.notFound().build();
     }
 
-    @PostMapping({"/{id}/invite"})
-    public ResponseEntity<ParticipantCreateResponse> inviteParticipant(@PathVariable UUID id, @RequestBody ParticipantRequestPayload payload){
-        Optional<Trip> trip = repository.findById(id);
-
-        // verificando se a trip existe
-        if (trip.isPresent()){
-            Trip rawTrip = trip.get();
-
-
-            ParticipantCreateResponse participantCreateResponse = participantService.registerParticipantToEvent(payload.email(), rawTrip);
-
-            // verificando se a viagem ja foi foi confirmada
-            if (rawTrip.getIsConfirmed()) participantService.triggerConfirmationEmailToParticipant(payload.email());
-
-            return ResponseEntity.ok(participantCreateResponse);
-        }
-
-        return ResponseEntity.notFound().build();
-    }
+    // ACTIVITIES
 
     @GetMapping("/{id}/activities")
     public ResponseEntity<List<ActivityData>> getAllActivities(@PathVariable UUID id){
@@ -124,9 +111,49 @@ public class TripControler {
         return ResponseEntity.notFound().build();
     }
 
+    // PARTICIPANTS
+
     @GetMapping("/{id}/participants")
-    public ResponseEntity<List<ParticipantData>> getAllParticipats(@PathVariable UUID id){
+    public ResponseEntity<List<ParticipantData>> getAllParticipants(@PathVariable UUID id){
         List<ParticipantData> participantList = this.participantService.getAllParticipantsFromEvent(id);
         return ResponseEntity.ok(participantList);
+    }
+
+    @PostMapping({"/{id}/invite"})
+    public ResponseEntity<ParticipantCreateResponse> inviteParticipant(@PathVariable UUID id, @RequestBody ParticipantRequestPayload payload){
+        Optional<Trip> trip = repository.findById(id);
+
+        // verificando se a trip existe
+        if (trip.isPresent()){
+            Trip rawTrip = trip.get();
+
+
+            ParticipantCreateResponse participantCreateResponse = participantService.registerParticipantToEvent(payload.email(), rawTrip);
+
+            // verificando se a viagem ja foi foi confirmada
+            if (rawTrip.getIsConfirmed()) participantService.triggerConfirmationEmailToParticipant(payload.email());
+
+            return ResponseEntity.ok(participantCreateResponse);
+        }
+
+        return ResponseEntity.notFound().build();
+    }
+
+    // LINKS
+
+    @PostMapping({"/{id}/links"})
+    public ResponseEntity<LinkResponse> registerLink(@PathVariable UUID id, @RequestBody LinkRequestPayload payload){
+        Optional<Trip> trip = repository.findById(id);
+
+        // verificando se a trip existe
+        if (trip.isPresent()){
+            Trip rawTrip = trip.get();
+
+            LinkResponse linkResponse = this.linkService.registerLink(payload, rawTrip);
+
+            return ResponseEntity.ok(linkResponse);
+        }
+
+        return ResponseEntity.notFound().build();
     }
 }
