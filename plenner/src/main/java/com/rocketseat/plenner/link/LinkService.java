@@ -1,11 +1,9 @@
 package com.rocketseat.plenner.link;
 
-import com.rocketseat.plenner.activity.ActivityData;
 import com.rocketseat.plenner.trip.Trip;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -23,7 +21,7 @@ public class LinkService {
         return new LinkResponse(newLink.getId());
     }
 
-    public List<ActivityData> getAllActivitiesFromEvent(UUID tripId){
-        return new ArrayList<>();
+    public List<LinkData> getAllLinksFromEvent(UUID tripId){
+        return this.repository.findByTripId(tripId).stream().map(link -> new LinkData(link.getId(), link.getTitle(), link.getUrl())).toList();
     }
 }

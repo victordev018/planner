@@ -1,6 +1,7 @@
 package com.rocketseat.plenner.trip;
 
 import com.rocketseat.plenner.activity.*;
+import com.rocketseat.plenner.link.LinkData;
 import com.rocketseat.plenner.link.LinkRequestPayload;
 import com.rocketseat.plenner.link.LinkResponse;
 import com.rocketseat.plenner.link.LinkService;
@@ -155,5 +156,11 @@ public class TripControler {
         }
 
         return ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("/{id}/links")
+    public ResponseEntity<List<LinkData>> getAllALinks(@PathVariable UUID id){
+        List<LinkData> linkDataList = this.linkService.getAllLinksFromEvent(id);
+        return ResponseEntity.ok(linkDataList);
     }
 }
