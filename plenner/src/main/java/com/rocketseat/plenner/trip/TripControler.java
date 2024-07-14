@@ -1,5 +1,8 @@
 package com.rocketseat.plenner.trip;
 
+import com.rocketseat.plenner.activities.ActivityRequestPayload;
+import com.rocketseat.plenner.activities.ActivityResponse;
+import com.rocketseat.plenner.activities.ActivityService;
 import com.rocketseat.plenner.participant.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +21,9 @@ public class TripControler {
 
     @Autowired
     private ParticipantService participantService;
+
+    @Autowired
+    private ActivityService activityService;
 
     @Autowired
     private TripRepository repository;
@@ -94,6 +100,22 @@ public class TripControler {
             if (rawTrip.getIsConfirmed()) participantService.triggerConfirmationEmailToParticipant(payload.email());
 
             return ResponseEntity.ok(participantCreateResponse);
+        }
+
+        return ResponseEntity.notFound().build();
+    }
+
+    @PostMapping({"/{id}/activities"})
+    public ResponseEntity<ActivityResponse> registerActivity(@PathVariable UUID id, @RequestBody ActivityRequestPayload payload){
+        Optional<Trip> trip = repository.findById(id);
+
+        // verificando se a trip existe
+        if (trip.isPresent()){
+            Trip rawTrip = trip.get();
+
+            ActivityResponse activityResponse = this.activityService.registerActivity(payload, rawTrip);
+
+            return ResponseEntity.ok(activityResponse);
         }
 
         return ResponseEntity.notFound().build();
