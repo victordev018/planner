@@ -1,8 +1,6 @@
 package com.rocketseat.plenner.trip;
 
-import com.rocketseat.plenner.participant.ParticipantCreateResponse;
-import com.rocketseat.plenner.participant.ParticipantRequestPayload;
-import com.rocketseat.plenner.participant.ParticipantService;
+import com.rocketseat.plenner.participant.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -99,5 +97,11 @@ public class TripControler {
         }
 
         return ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("/{id}/participants")
+    public ResponseEntity<List<ParticipantData>> getAllParticipats(@PathVariable UUID id){
+        List<ParticipantData> participantList = this.participantService.getAllParticipantsFromEvent(id);
+        return ResponseEntity.ok(participantList);
     }
 }
