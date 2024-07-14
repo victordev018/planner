@@ -1,6 +1,6 @@
 package com.rocketseat.plenner.trip;
 
-import com.rocketseat.plenner.activities.*;
+import com.rocketseat.plenner.activity.*;
 import com.rocketseat.plenner.participant.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;

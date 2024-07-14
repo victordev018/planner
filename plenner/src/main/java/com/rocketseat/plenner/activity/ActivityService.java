@@ -1,4 +1,4 @@
-package com.rocketseat.plenner.activities;
+package com.rocketseat.plenner.activity;
 
 import com.rocketseat.plenner.trip.Trip;
 import org.springframework.beans.factory.annotation.Autowired;

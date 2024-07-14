@@ -1,4 +1,4 @@
-package com.rocketseat.plenner.activities;
+package com.rocketseat.plenner.activity;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
