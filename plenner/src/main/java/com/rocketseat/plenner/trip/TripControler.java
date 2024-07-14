@@ -1,5 +1,7 @@
 package com.rocketseat.plenner.trip;
 
+import com.rocketseat.plenner.participant.ParticipantCreateResponse;
+import com.rocketseat.plenner.participant.ParticipantRequestPayload;
 import com.rocketseat.plenner.participant.ParticipantService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -7,6 +9,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -72,6 +76,26 @@ public class TripControler {
             // chamada do serviço que dispara os emails para os participantes
             this.participantService.triggerConfirmationEmailToParticipants(id);
             return ResponseEntity.ok(rawTrip);
+        }
+
+        return ResponseEntity.notFound().build();
+    }
+
+    @PostMapping({"/{id}/invite"})
+    public ResponseEntity<ParticipantCreateResponse> inviteParticipant(@PathVariable UUID id, @RequestBody ParticipantRequestPayload payload){
+        Optional<Trip> trip = repository.findById(id);
+
+        // verificando se a trip existe
+        if (trip.isPresent()){
+            Trip rawTrip = trip.get();
+
+
+            ParticipantCreateResponse participantCreateResponse = participantService.registerParticipantToEvent(payload.email(), rawTrip);
+
+            // verificando se a viagem ja foi foi confirmada
+            if (rawTrip.getIsConfirmed()) participantService.triggerConfirmationEmailToParticipant(payload.email());
+
+            return ResponseEntity.ok(participantCreateResponse);
         }
 
         return ResponseEntity.notFound().build();
